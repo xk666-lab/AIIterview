@@ -1,9 +1,18 @@
-// models/User.js
-import mongoose from 'mongoose';
+// models/User.ts
+import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-// 检查模型是否已经存在，避免Next.js开发环境下的热重载错误
-const UserSchema = new mongoose.Schema({
+// 定义User文档接口
+interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema = new Schema<IUser>({
   name: {
     type: String,
     required: true
@@ -35,13 +44,16 @@ UserSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
-    next(error);
+    next(error as Error);
   }
 });
 
 // 验证密码方法
-UserSchema.methods.comparePassword = async function(candidatePassword) {
+UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+// 避免TS中的模型重复定义错误
+const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+
+export default User;
