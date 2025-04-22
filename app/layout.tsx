@@ -21,7 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${monaSans.className} dark antialiased  pattern`}>
-        {/* ${monaSans.className}
+        {/* 
+        ${monaSans.className}
 这是 Next.js 15.3.0 中的字体系统生成的特定类名
 monaSans 是您通过 next/font 导入并配置的字体对象
 .className 会生成一个唯一的类名,用于应用该字体
